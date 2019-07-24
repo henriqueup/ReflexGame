@@ -7,11 +7,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D88B6687-3C94-4A3F-9C73-87D9B5259B9E}</ProjectGuid>
+    <ProjectGuid>{D5A3B976-3DDC-434B-8472-67292E7E2853}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Form1Tests</RootNamespace>
-    <AssemblyName>Form1Tests</AssemblyName>
+    <RootNamespace>ReflexGame.UnitTests</RootNamespace>
+    <AssemblyName>ReflexGame.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

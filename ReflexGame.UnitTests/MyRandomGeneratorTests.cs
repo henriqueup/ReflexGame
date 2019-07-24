@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace Form1Tests
+namespace ReflexGame.UnitTests
 {
     [TestFixture]
-    public class UnitTest1
+    public class MyRandomGeneratorTests
     {
         [Test]
         public void TestMethod1()
