@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace ReflexGame
 {
-    class MyRandomGenerator
+    public class MyRandomGenerator
     {
-        readonly bool isFake;
+        public readonly bool isFake;
         Random trueGenerator;
 
         public MyRandomGenerator(bool isFake = false)
@@ -44,6 +44,7 @@ namespace ReflexGame
         private Rectangle GetRandomSquare(MyRandomGenerator rnd)
         {
             int squareSize = rnd.NextInt(10, 100);
+            return new Rectangle(new Point(0, 0), new Size(squareSize, squareSize));
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
