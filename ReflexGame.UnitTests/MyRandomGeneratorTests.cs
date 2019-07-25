@@ -7,22 +7,12 @@ namespace ReflexGame.UnitTests
     public class MyRandomGeneratorTests
     {
         [Test]
-        public void Constructor_IsFake()
+        public void NextInt_Fake_ValueEquals20()
         {
             //Arrange
-            MyRandomGenerator rnd = new MyRandomGenerator(true);
+            FakeRandomNumberGenerator rnd = new FakeRandomNumberGenerator();
             //Act
-            //Assert
-            Assert.That(rnd.isFake == true);
-        }
-
-        [Test]
-        public void NextInt_Fake()
-        {
-            //Arrange
-            MyRandomGenerator rnd = new MyRandomGenerator(true);
-            //Act
-            int result = rnd.NextInt(0, 100, 20);
+            int result = rnd.NextInt(0, 100);
             //Assert
             Assert.That(result == 20);
         }
