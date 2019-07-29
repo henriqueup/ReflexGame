@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,26 +14,36 @@ namespace ReflexGame
 {
     public partial class Form1 : Form
     {
+        Thread circleCreation, circleGrowth;
         bool playing;
+        MyRandomNumberGenerator rnd;
         public List<Rectangle> circles = new List<Rectangle>(); //try my own class of rectangles for performance comparison
 
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(Form1_Closing);
             this.MouseDown += new MouseEventHandler(Form1_MouseDown);
             DoubleBuffered = true;
+            rnd = new MyRandomNumberGenerator();
 
             playing = true;
             Run();
+        }
+
+        public void Form1_Closing(object sender, FormClosingEventArgs e)
+        {
+            circleCreation.Join();
+            circleGrowth.Join();
         }
 
         public void CreatesCircles()
         {
             while (playing)
             {
-                if (circles.Count < 10)
+                if (circles.Count < 1000)
                 {
-                    Wait(2000);
+                    Wait(100);
                     CreateNewCircle();
                     UpdatePainting();
                 }
@@ -67,13 +78,13 @@ namespace ReflexGame
             CreateNewCircle();
             UpdatePainting();
 
-            Thread circleCreation = new Thread(new ThreadStart(CreatesCircles))
+            circleCreation = new Thread(new ThreadStart(CreatesCircles))
             {
                 IsBackground = true
             };
             circleCreation.Start();
 
-            Thread circleGrowth = new Thread (new ThreadStart(GrowsCircles))
+            circleGrowth = new Thread (new ThreadStart(GrowsCircles))
             {
                 IsBackground = true
             };
@@ -121,7 +132,8 @@ namespace ReflexGame
 
         public void CreateNewCircle()
         {
-            Rectangle rect = GetRandomSquare(new MyRandomNumberGenerator());
+            Rectangle rect = GetRandomSquare(rnd);
+            Debug.Print(rect.Location.X + ", " + rect.Location.Y);
             circles.Add(rect);
         }
 
