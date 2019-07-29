@@ -8,9 +8,15 @@ namespace ReflexGame
 {
     public class MyRandomNumberGenerator : IRandomNumberGenerator
     {
+        Random rnd;
+
+        public MyRandomNumberGenerator()
+        {
+            rnd = new Random();
+        }
+
         public int NextInt(int start, int limit)
         {
-            Random rnd = new Random();
             return rnd.Next(start, limit);
         }
     }

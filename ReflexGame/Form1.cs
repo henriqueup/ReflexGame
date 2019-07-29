@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,17 +14,27 @@ namespace ReflexGame
 {
     public partial class Form1 : Form
     {
+        Thread circleCreation, circleGrowth;
         bool playing;
+        MyRandomNumberGenerator rnd;
         public List<Rectangle> circles = new List<Rectangle>(); //try my own class of rectangles for performance comparison
 
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(Form1_Closing);
             this.MouseDown += new MouseEventHandler(Form1_MouseDown);
             DoubleBuffered = true;
+            rnd = new MyRandomNumberGenerator();
 
             playing = true;
             Run();
+        }
+
+        public void Form1_Closing(object sender, FormClosingEventArgs e)
+        {
+            //circleCreation.Join();
+            //circleGrowth.Join();
         }
 
         public void CreatesCircles()
@@ -32,7 +43,7 @@ namespace ReflexGame
             {
                 if (circles.Count < 10)
                 {
-                    Wait(2000);
+                    Wait(500);
                     CreateNewCircle();
                     UpdatePainting();
                 }
@@ -56,7 +67,7 @@ namespace ReflexGame
         {
             while (playing)
             {
-                Wait(200);
+                Wait(100);
                 GrowAllCircles();
                 UpdatePainting();
             }
@@ -64,40 +75,70 @@ namespace ReflexGame
 
         public void Run()
         {
-            CreateNewCircle();
-            UpdatePainting();
+            //CreateNewCircle();
+            //UpdatePainting();
 
-            Thread circleCreation = new Thread(new ThreadStart(CreatesCircles))
+            circleCreation = new Thread(new ThreadStart(CreatesCircles))
             {
                 IsBackground = true
             };
             circleCreation.Start();
 
-            Thread circleGrowth = new Thread (new ThreadStart(GrowsCircles))
+            circleGrowth = new Thread (new ThreadStart(GrowsCircles))
             {
                 IsBackground = true
             };
-            circleGrowth.Start();
+            //circleGrowth.Start();
+        }
+
+        public bool GetThreadStatuses()
+        {
+            return circleCreation.IsAlive && circleGrowth.IsAlive;
         }
 
         public Rectangle GetRandomSquare(IRandomNumberGenerator rnd)
         {
-            int x = rnd.NextInt(0, this.Size.Width-20);
-            int y = rnd.NextInt(0, this.Size.Height-20);
+            int x = rnd.NextInt(0, this.Size.Width-35);
+            int y = rnd.NextInt(0, this.Size.Height-60);
             return new Rectangle(new Point(x, y), new Size(20, 20));
+        }
+
+        public bool PointIsInsideCircle(Point clicked, Rectangle circle)
+        {
+            Point circleCenter = circle.Location;
+            circleCenter.X += circle.Width / 2;
+            circleCenter.Y += circle.Height / 2;
+
+            double clickedDistanceFromCenter = Math.Sqrt((clicked.X - circleCenter.X) * (clicked.X - circleCenter.X) + (clicked.Y - circleCenter.Y) * (clicked.Y - circleCenter.Y));
+            return clickedDistanceFromCenter <= circle.Width / 2;
+        }
+
+        public void ProcessClick(Point clicked)
+        {
+            for (int i = 0; i < circles.Count; i++)
+            {
+                if (PointIsInsideCircle(clicked, circles[i]))
+                {
+                    circles.RemoveAt(i);
+                    i--;
+                    UpdatePainting();
+                }
+            }
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                Point clicked = new Point(Cursor.Position.X, Cursor.Position.Y);
+                Point clicked = new Point(Cursor.Position.X - this.Left - 8, Cursor.Position.Y - this.Top - 30);
+                textBox1.Text = clicked.X + ", " + clicked.Y;
+                ProcessClick(clicked);
             }
         }
 
         public void CreateNewCircle()
         {
-            Rectangle rect = GetRandomSquare(new MyRandomNumberGenerator());
+            Rectangle rect = GetRandomSquare(rnd);
             circles.Add(rect);
         }
 
