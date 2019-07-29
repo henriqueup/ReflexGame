@@ -15,6 +15,8 @@ namespace ReflexGame
     public partial class Form1 : Form
     {
         Thread circleCreation, circleGrowth;
+        const string scoreStr = "Score: ";
+        int curScore;
         bool playing;
         MyRandomNumberGenerator rnd;
         public List<Rectangle> circles = new List<Rectangle>(); //try my own class of rectangles for performance comparison
@@ -28,7 +30,13 @@ namespace ReflexGame
             rnd = new MyRandomNumberGenerator();
 
             playing = true;
+            curScore = 0;
             Run();
+        }
+
+        public int GetCurrentScore()
+        {
+            return curScore;
         }
 
         public void Form1_Closing(object sender, FormClosingEventArgs e)
@@ -43,7 +51,7 @@ namespace ReflexGame
             {
                 if (circles.Count < 10)
                 {
-                    Wait(500);
+                    Wait(1000);
                     CreateNewCircle();
                     UpdatePainting();
                 }
@@ -88,7 +96,7 @@ namespace ReflexGame
             {
                 IsBackground = true
             };
-            //circleGrowth.Start();
+            circleGrowth.Start();
         }
 
         public bool GetThreadStatuses()
@@ -113,12 +121,21 @@ namespace ReflexGame
             return clickedDistanceFromCenter <= circle.Width / 2;
         }
 
+        void AddScore(Rectangle circle)
+        {
+            double circleArea = Math.PI * (circle.Width/2)*(circle.Width/2);
+            curScore += (int)circleArea;
+            labelScore.Text = scoreStr + curScore;
+        }
+
         public void ProcessClick(Point clicked)
         {
             for (int i = 0; i < circles.Count; i++)
             {
                 if (PointIsInsideCircle(clicked, circles[i]))
                 {
+                    AddScore(circles[i]);
+
                     circles.RemoveAt(i);
                     i--;
                     UpdatePainting();
@@ -131,7 +148,6 @@ namespace ReflexGame
             if (e.Button == MouseButtons.Left)
             {
                 Point clicked = new Point(Cursor.Position.X - this.Left - 8, Cursor.Position.Y - this.Top - 30);
-                textBox1.Text = clicked.X + ", " + clicked.Y;
                 ProcessClick(clicked);
             }
         }

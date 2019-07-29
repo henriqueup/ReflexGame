@@ -153,5 +153,19 @@ namespace ReflexGame.UnitTests
             //Added 3 circles, clicked on first two, so both should be removed
             Assert.That(form.circles.Count == 3);
         }
+
+        [Test]
+        public void AddScore_CircleOfRadius1_AddsPI()
+        {
+            //Arrange
+            Form1 form = new Form1();
+            Rectangle circleRadius1 = new Rectangle(new Point(0, 0), new Size(2, 2));
+            //Act
+            form.circles.Add(circleRadius1);
+            form.ProcessClick(new Point(1, 1));
+            int score = form.GetCurrentScore();
+            //Assert
+            Assert.That(score == (int)Math.PI);
+        }
     }
 }
