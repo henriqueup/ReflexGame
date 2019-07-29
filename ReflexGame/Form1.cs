@@ -33,17 +33,17 @@ namespace ReflexGame
 
         public void Form1_Closing(object sender, FormClosingEventArgs e)
         {
-            circleCreation.Join();
-            circleGrowth.Join();
+            //circleCreation.Join();
+            //circleGrowth.Join();
         }
 
         public void CreatesCircles()
         {
             while (playing)
             {
-                if (circles.Count < 1000)
+                if (circles.Count < 10)
                 {
-                    Wait(100);
+                    Wait(500);
                     CreateNewCircle();
                     UpdatePainting();
                 }
@@ -67,7 +67,7 @@ namespace ReflexGame
         {
             while (playing)
             {
-                Wait(200);
+                Wait(100);
                 GrowAllCircles();
                 UpdatePainting();
             }
@@ -75,8 +75,8 @@ namespace ReflexGame
 
         public void Run()
         {
-            CreateNewCircle();
-            UpdatePainting();
+            //CreateNewCircle();
+            //UpdatePainting();
 
             circleCreation = new Thread(new ThreadStart(CreatesCircles))
             {
@@ -88,13 +88,18 @@ namespace ReflexGame
             {
                 IsBackground = true
             };
-            circleGrowth.Start();
+            //circleGrowth.Start();
+        }
+
+        public bool GetThreadStatuses()
+        {
+            return circleCreation.IsAlive && circleGrowth.IsAlive;
         }
 
         public Rectangle GetRandomSquare(IRandomNumberGenerator rnd)
         {
-            int x = rnd.NextInt(0, this.Size.Width-20);
-            int y = rnd.NextInt(0, this.Size.Height-20);
+            int x = rnd.NextInt(0, this.Size.Width-35);
+            int y = rnd.NextInt(0, this.Size.Height-60);
             return new Rectangle(new Point(x, y), new Size(20, 20));
         }
 
@@ -115,6 +120,7 @@ namespace ReflexGame
                 if (PointIsInsideCircle(clicked, circles[i]))
                 {
                     circles.RemoveAt(i);
+                    i--;
                     UpdatePainting();
                 }
             }
@@ -133,7 +139,6 @@ namespace ReflexGame
         public void CreateNewCircle()
         {
             Rectangle rect = GetRandomSquare(rnd);
-            Debug.Print(rect.Location.X + ", " + rect.Location.Y);
             circles.Add(rect);
         }
 
