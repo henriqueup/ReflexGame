@@ -87,11 +87,35 @@ namespace ReflexGame
             return new Rectangle(new Point(x, y), new Size(20, 20));
         }
 
+        public bool PointIsInsideCircle(Point clicked, Rectangle circle)
+        {
+            Point circleCenter = circle.Location;
+            circleCenter.X += circle.Width / 2;
+            circleCenter.Y += circle.Height / 2;
+
+            double clickedDistanceFromCenter = Math.Sqrt((clicked.X - circleCenter.X) * (clicked.X - circleCenter.X) + (clicked.Y - circleCenter.Y) * (clicked.Y - circleCenter.Y));
+            return clickedDistanceFromCenter <= circle.Width / 2;
+        }
+
+        public void ProcessClick(Point clicked)
+        {
+            for (int i = 0; i < circles.Count; i++)
+            {
+                if (PointIsInsideCircle(clicked, circles[i]))
+                {
+                    circles.RemoveAt(i);
+                    UpdatePainting();
+                }
+            }
+        }
+
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                Point clicked = new Point(Cursor.Position.X, Cursor.Position.Y);
+                Point clicked = new Point(Cursor.Position.X - this.Left - 8, Cursor.Position.Y - this.Top - 30);
+                textBox1.Text = clicked.X + ", " + clicked.Y;
+                ProcessClick(clicked);
             }
         }
 
