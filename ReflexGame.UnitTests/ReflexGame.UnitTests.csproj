@@ -56,6 +56,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FakeRandomNumberGenerator.cs" />
+    <Compile Include="Form1Tests.cs" />
     <Compile Include="MyRandomGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
