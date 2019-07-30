@@ -120,11 +120,6 @@ namespace ReflexGame
             }
         }
 
-        public bool GetThreadStatuses()
-        {
-            return circleCreation.IsAlive && circleGrowth.IsAlive;
-        }
-
         public Rectangle GetRandomSquare(IRandomNumberGenerator rnd)
         {
             int x = rnd.NextInt(0, this.Size.Width-35);

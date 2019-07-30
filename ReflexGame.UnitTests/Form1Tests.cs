@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using NUnit.Framework;
+using System.Threading;
 
 namespace ReflexGame.UnitTests
 {
@@ -85,13 +87,20 @@ namespace ReflexGame.UnitTests
         }
 
         [Test]
-        public void Form1_Run_CreatesFirstCircleAndThreads()
+        public void Form1_Run_ChecksCirclesAndThreads()
         {
             //Arrange
             Form1 form = new Form1();
+            form.UI = new UI(form);
+            Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject pvt = new Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject(form);
+            ComboBox cbModes = (ComboBox)pvt.GetField("comboBoxModes");
             //Act
+            cbModes.SelectedIndex = 1;
+            form.Run();
+            Thread circleCreation = (Thread)pvt.GetField("circleCreation");
+            Thread circleGrowth = (Thread)pvt.GetField("circleGrowth");
             //Assert
-            Assert.That(form.circles.Count == 0 && form.GetThreadStatuses());
+            Assert.That(form.circles.Count == 0 && circleCreation.IsAlive && circleGrowth.IsAlive);
         }
 
         //ProcessClick
@@ -102,6 +111,7 @@ namespace ReflexGame.UnitTests
         {
             //Arrange
             Form1 form = new Form1();
+            form.UI = new UI(form);
             Rectangle circle1 = new Rectangle(new Point(0, 0), new Size(20, 20));
             form.circles.Add(circle1);
             Rectangle circle2 = new Rectangle(new Point(20, 20), new Size(20, 20));
@@ -121,6 +131,7 @@ namespace ReflexGame.UnitTests
         {
             //Arrange
             Form1 form = new Form1();
+            form.UI = new UI(form);
             Rectangle circle1 = new Rectangle(new Point(0, 0), new Size(20, 20));
             form.circles.Add(circle1);
             Rectangle circle2 = new Rectangle(new Point(0, 0), new Size(40, 40));
@@ -159,6 +170,7 @@ namespace ReflexGame.UnitTests
         {
             //Arrange
             Form1 form = new Form1();
+            form.UI = new UI(form);
             Rectangle circleRadius1 = new Rectangle(new Point(0, 0), new Size(2, 2));
             //Act
             form.circles.Add(circleRadius1);
@@ -173,9 +185,11 @@ namespace ReflexGame.UnitTests
         {
             //Arrange
             Form1 form = new Form1();
+            form.UI = new UI(form);
             Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject pvt = new Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject(form);
-            System.Windows.Forms.Button buttonPlay = (System.Windows.Forms.Button)pvt.GetField("buttonPlay");
-            System.Windows.Forms.Label labelScore = (System.Windows.Forms.Label)pvt.GetField("labelScore");
+            Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject pvtUI = new Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject(form.UI);
+            Button buttonPlay = (Button)pvt.GetField("buttonPlay");
+            Label labelScore = (Label)pvtUI.GetField("labelScore");
             //Act
             pvt.Invoke("buttonPlay_Click", new object[2] {this, new EventArgs()});
             //Assert
