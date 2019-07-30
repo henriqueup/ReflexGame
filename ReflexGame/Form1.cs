@@ -17,6 +17,7 @@ namespace ReflexGame
         public UI UI;
         Thread circleCreation, circleGrowth, timerThread;
         int limitValue;
+        public int circlesHit { get; private set; }
         List<string> labelLimitValues = new List<string>();
         public bool IsPlaying { get; private set; }
         MyRandomNumberGenerator rnd;
@@ -144,6 +145,7 @@ namespace ReflexGame
                 if (PointIsInsideCircle(clicked, circles[i]))
                 {
                     UI.AddScore(circles[i]);
+                    circlesHit++;
 
                     circles.RemoveAt(i);
                     i--;
@@ -197,6 +199,7 @@ namespace ReflexGame
         private void buttonPlay_Click(object sender, EventArgs e)
         {
             IsPlaying = true;
+            circlesHit = 0;
             UI = new UI(this);
 
             this.Size = new Size(800, 600);

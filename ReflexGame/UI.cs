@@ -45,10 +45,10 @@ namespace ReflexGame
                 TextAlign = ContentAlignment.MiddleCenter,
                 BorderStyle = BorderStyle.None,
                 Font = new Font("Arial", 64, FontStyle.Bold),
-                Text = "Game Over!" + Environment.NewLine + "Score: " + curScore,
+                Text = "Game Over!" + Environment.NewLine + "Score: " + curScore + Environment.NewLine + "Circles Hit: " + form.circlesHit,
                 Size = new Size(600, 400),
                 Tag = "GameOver",
-                Location = new Point(100, 20),
+                Location = new Point(100, 10),
                 Visible = true
             };
 
@@ -56,16 +56,19 @@ namespace ReflexGame
             {
                 Text = "Return to Menu",
                 Size = new Size(200, 60),
-                Location = new Point(290, 350),
+                Location = new Point(290, 380),
                 Tag = "GameOver",
                 Visible = true
             };
 
             buttonReturnToMenu.Click += ButtonReturnToMenu_Click;
 
-            form.Controls.Add(labelGameOver);
-            form.Controls.Add(buttonReturnToMenu);
-            buttonReturnToMenu.BringToFront();
+            //form.Controls.Add(labelGameOver);
+            //form.Controls.Add(buttonReturnToMenu);
+            //buttonReturnToMenu.BringToFront();
+            form.Invoke(new MethodInvoker(delegate { form.Controls.Add(labelGameOver); }));
+            form.Invoke(new MethodInvoker(delegate { form.Controls.Add(buttonReturnToMenu); }));
+            form.Invoke(new MethodInvoker(delegate { buttonReturnToMenu.BringToFront(); }));
         }
 
         private void ButtonReturnToMenu_Click(object sender, EventArgs e)
