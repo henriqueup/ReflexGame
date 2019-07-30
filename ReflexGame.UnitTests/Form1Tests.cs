@@ -163,9 +163,23 @@ namespace ReflexGame.UnitTests
             //Act
             form.circles.Add(circleRadius1);
             form.ProcessClick(new Point(1, 1));
-            int score = form.GetCurrentScore();
+            int score = form.UI.curScore;
             //Assert
             Assert.That(score == (int)Math.PI);
+        }
+
+        [Test]
+        public void PlayButton_DefaultMode_Started()
+        {
+            //Arrange
+            Form1 form = new Form1();
+            Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject pvt = new Microsoft.VisualStudio.TestTools.UnitTesting.PrivateObject(form);
+            System.Windows.Forms.Button buttonPlay = (System.Windows.Forms.Button)pvt.GetField("buttonPlay");
+            System.Windows.Forms.Label labelScore = (System.Windows.Forms.Label)pvt.GetField("labelScore");
+            //Act
+            pvt.Invoke("buttonPlay_Click", new object[2] {this, new EventArgs()});
+            //Assert
+            Assert.That(form.IsPlaying && labelScore.Text == "Score: 0");
         }
     }
 }

@@ -14,10 +14,11 @@ namespace ReflexGame
 {
     public partial class Form1 : Form
     {
-        Thread circleCreation, circleGrowth;
-        const string scoreStr = "Score: ";
-        int curScore;
-        bool playing;
+        public UI UI;
+        Thread circleCreation, circleGrowth, timerThread;
+        int limitValue;
+        List<string> labelLimitValues = new List<string>();
+        public bool IsPlaying { get; private set; }
         MyRandomNumberGenerator rnd;
         public List<Rectangle> circles = new List<Rectangle>(); //try my own class of rectangles for performance comparison
 
@@ -28,15 +29,18 @@ namespace ReflexGame
             this.MouseDown += new MouseEventHandler(Form1_MouseDown);
             DoubleBuffered = true;
             rnd = new MyRandomNumberGenerator();
-
-            playing = true;
-            curScore = 0;
-            Run();
+            AddsGameModes();
         }
 
-        public int GetCurrentScore()
+        public void AddsGameModes()
         {
-            return curScore;
+            comboBoxModes.Items.Add("Timer");
+            comboBoxModes.Items.Add("Clicks");
+            labelLimitValues.Add("Limit (seconds):");
+            labelLimitValues.Add("Limit (clicks):");
+
+            comboBoxModes.SelectedIndex = 0;
+            labelLimit.Text = labelLimitValues[0];
         }
 
         public void Form1_Closing(object sender, FormClosingEventArgs e)
@@ -47,13 +51,16 @@ namespace ReflexGame
 
         public void CreatesCircles()
         {
-            while (playing)
+            while (IsPlaying)
             {
                 if (circles.Count < 10)
                 {
                     Wait(1000);
-                    CreateNewCircle();
-                    UpdatePainting();
+                    if (IsPlaying)
+                    {
+                        CreateNewCircle();
+                        UpdatePainting();
+                    }
                 }
             }
         }
@@ -73,7 +80,7 @@ namespace ReflexGame
 
         public void GrowsCircles()
         {
-            while (playing)
+            while (IsPlaying)
             {
                 Wait(100);
                 GrowAllCircles();
@@ -81,22 +88,36 @@ namespace ReflexGame
             }
         }
 
+        private void TimerMode(int timeToWait)
+        {
+            Wait(timeToWait * 1000);
+            IsPlaying = false;
+            UI.GameOver();
+        }
+
         public void Run()
         {
             //CreateNewCircle();
             //UpdatePainting();
 
-            circleCreation = new Thread(new ThreadStart(CreatesCircles))
+            circleCreation = new Thread(() => CreatesCircles())
             {
                 IsBackground = true
             };
             circleCreation.Start();
 
-            circleGrowth = new Thread (new ThreadStart(GrowsCircles))
+            circleGrowth = new Thread (() => GrowsCircles())
             {
                 IsBackground = true
             };
             circleGrowth.Start();
+
+            limitValue = Int32.Parse(numericUpDownLimitValue.Text);
+            if (comboBoxModes.SelectedIndex == 0)
+            {
+                timerThread = new Thread(() => TimerMode(limitValue));
+                timerThread.Start();
+            }
         }
 
         public bool GetThreadStatuses()
@@ -121,24 +142,28 @@ namespace ReflexGame
             return clickedDistanceFromCenter <= circle.Width / 2;
         }
 
-        void AddScore(Rectangle circle)
-        {
-            double circleArea = Math.PI * (circle.Width/2)*(circle.Width/2);
-            curScore += (int)circleArea;
-            labelScore.Text = scoreStr + curScore;
-        }
-
         public void ProcessClick(Point clicked)
         {
             for (int i = 0; i < circles.Count; i++)
             {
                 if (PointIsInsideCircle(clicked, circles[i]))
                 {
-                    AddScore(circles[i]);
+                    UI.AddScore(circles[i]);
 
                     circles.RemoveAt(i);
                     i--;
                     UpdatePainting();
+
+
+                    if (comboBoxModes.SelectedIndex == 1)
+                    {
+                        limitValue--;
+                        if (limitValue == 0)
+                        {
+                            IsPlaying = false;
+                            UI.GameOver();
+                        }
+                    }
                 }
             }
         }
@@ -172,6 +197,28 @@ namespace ReflexGame
             //Console.WriteLine("printing");
             this.Invalidate();
             this.Paint += new PaintEventHandler(this.Form1_Paint);
+        }
+
+        private void buttonPlay_Click(object sender, EventArgs e)
+        {
+            IsPlaying = true;
+            UI = new UI(this);
+
+            this.Size = new Size(800, 600);
+            foreach (Control c in this.Controls)
+            {
+                if (c.Tag.ToString() == "Menu")
+                {
+                    c.Visible = false;
+                }
+            }
+            
+            Run();
+        }
+
+        private void comboBoxModes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            labelLimit.Text = labelLimitValues[comboBoxModes.SelectedIndex];
         }
 
         public void Wait(int milliseconds)
