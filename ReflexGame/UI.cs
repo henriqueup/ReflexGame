@@ -33,8 +33,12 @@ namespace ReflexGame
 
         public void AddScore(Rectangle circle)
         {
-            double circleArea = Math.PI * (circle.Width / 2) * (circle.Width / 2);
-            curScore += (int)circleArea;
+            //double circleArea = Math.PI * (circle.Width / 2) * (circle.Width / 2);
+            //curScore += (int)circleArea;
+            int perfectScore = 100;
+            int scoreDifference = 20 - circle.Width;
+            if (scoreDifference < 0) scoreDifference = 0;
+            curScore += perfectScore + scoreDifference;
             labelScore.Text = scoreStr + curScore;
         }
 
